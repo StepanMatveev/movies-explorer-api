@@ -2,11 +2,11 @@ require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const router = require('./routes/index.js');
+const limiter = require('./utils/limiter.js');
 
 const PORT = 3000;
 const app = express();
@@ -20,8 +20,9 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 app.use(cors());
 app.use(helmet());
 app.disable('x-powered-by');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(limiter);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -32,9 +33,6 @@ app.use((req, res, next) => {
 });
 
 app.use(cors());
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
