@@ -7,22 +7,21 @@ const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const router = require('./routes/index.js');
 const limiter = require('./utils/limiter.js');
+const centralErrorHandler = require('./middlewares/centralErrorHandler.js');
+const { CFG, mongooseParams } = require('./utils/config.js');
 
-const PORT = 3000;
+const {
+  PORT = CFG.PORT,
+  MONGO = CFG.MONGO,
+} = process.env;
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-  useUnifiedTopology: true,
-});
+mongoose.connect(MONGO, mongooseParams);
 app.use(cors());
 app.use(helmet());
 app.disable('x-powered-by');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(limiter);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -33,9 +32,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cors());
-
 app.use(requestLogger);
-
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');
@@ -43,21 +40,9 @@ app.get('/crash-test', () => {
 });
 
 app.use('/', router);
-
 app.use(errorLogger);
-
 app.use(errors());
-
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-  next();
-});
+app.use(limiter);
+app.use(centralErrorHandler);
 
 app.listen(PORT);

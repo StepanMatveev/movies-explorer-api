@@ -4,9 +4,19 @@ const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 
 module.exports.createMovie = (req, res, next) => {
-  const { _id: userId } = req.user;
+  const owner = req.user._id;
   const {
-    country, director, duration, year, description, image, trailer, thumbnail, nameRU, nameEN,
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailer,
+    thumbnail,
+    nameRU,
+    nameEN,
+    movieId,
   } = req.body;
   Movie.create({
     country,
@@ -19,9 +29,10 @@ module.exports.createMovie = (req, res, next) => {
     thumbnail,
     nameRU,
     nameEN,
-    owner: userId,
+    movieId,
+    owner,
   })
-    .then((card) => res.send({ data: card }))
+    .then((movie) => res.send({ data: movie }))
     .catch(() => next(new BadRequestError()));
 };
 

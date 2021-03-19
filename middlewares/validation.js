@@ -20,7 +20,7 @@ const validateAddMovie = celebrate({
       if (!isURL(value)) throw new CelebrateError('Некорректный URL');
       return value;
     }),
-    owner: Joi.string().required(),
+    movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
   }),
@@ -43,6 +43,16 @@ const validateRegister = celebrate({
   }),
 });
 
+const validateUpdateProfile = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    email: Joi.string().required().custom((value) => {
+      if (!isEmail(value)) throw new CelebrateError('Некорректный Email');
+      return value;
+    }),
+  }),
+});
+
 const validateLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().custom((value) => {
@@ -58,4 +68,5 @@ module.exports = {
   validateDeleteMovie,
   validateLogin,
   validateRegister,
+  validateUpdateProfile,
 };
