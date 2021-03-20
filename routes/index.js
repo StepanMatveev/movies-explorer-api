@@ -14,5 +14,10 @@ router.use('/movies', auth, movieRouter);
 router.use('/*', (req, res, next) => {
   next(new NotFoundError('Страница не найдена'));
 });
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 module.exports = router;

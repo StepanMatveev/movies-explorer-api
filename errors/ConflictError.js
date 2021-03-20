@@ -1,5 +1,7 @@
+const { ConflictText } = require('../utils/consts.js');
+
 class ConflictError extends Error {
-  constructor(message = 'Конфликт запроса') {
+  constructor(message = ConflictText) {
     super(message);
     this.statusCode = 409;
   }

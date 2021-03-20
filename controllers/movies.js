@@ -2,6 +2,7 @@ const Movie = require('../models/movie.js');
 const BadRequestError = require('../errors/BadRequestError');
 const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
+const { MovieForbidenText, MovieNotFoundText } = require('../utils/consts.js');
 
 module.exports.createMovie = (req, res, next) => {
   const owner = req.user._id;
@@ -45,10 +46,10 @@ module.exports.getMovie = (req, res, next) => {
 module.exports.deleteMovie = (req, res, next) => {
   const { movieId } = req.params;
   Movie.findById(movieId).select('+owner')
-    .orFail(new NotFoundError('Карточка не найдена'))
+    .orFail(new NotFoundError(MovieNotFoundText))
     .then((movie) => {
       if (movie.owner.toString() !== req.user._id) {
-        throw new ForbiddenError('Нельзя удалять чужие карточки');
+        throw new ForbiddenError(MovieForbidenText);
       }
       movie.remove()
         .then((removedMovie) => res.send({ data: removedMovie }));

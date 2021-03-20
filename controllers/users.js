@@ -4,6 +4,7 @@ const User = require('../models/user.js');
 const NotFoundError = require('../errors/NotFoundError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const ConflictError = require('../errors/ConflictError');
+const { UserFConflictText, UserUnathorizedText } = require('../utils/consts.js');
 
 const { TOKEN_SECRET_KEY = 'token-secret-key' } = process.env;
 
@@ -23,7 +24,7 @@ module.exports.createUser = (req, res, next) => {
         })
         .catch((err) => {
           if (err.name === 'MongoError' && err.code === 11000) {
-            next(new ConflictError('Пользователь с таким емейл уже есть зарегестрирован'));
+            next(new ConflictError(UserFConflictText));
           }
           next(err);
         });
@@ -58,5 +59,5 @@ module.exports.login = (req, res, next) => {
       );
       res.send({ token });
     })
-    .catch(() => next(new UnauthorizedError('Неверный email или пароль')));
+    .catch(() => next(new UnauthorizedError(UserUnathorizedText)));
 };

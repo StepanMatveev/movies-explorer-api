@@ -1,5 +1,7 @@
+const { BadRequestText } = require('../utils/consts.js');
+
 class BadRequestError extends Error {
-  constructor(message = 'Неверный запрос') {
+  constructor(message = BadRequestText) {
     super(message);
     this.statusCode = 400;
   }

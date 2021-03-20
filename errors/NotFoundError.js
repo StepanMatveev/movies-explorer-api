@@ -1,5 +1,7 @@
+const { NotFoundText } = require('../utils/consts.js');
+
 class NotFoundError extends Error {
-  constructor(message = 'Запрашиваемый ресурс не найден') {
+  constructor(message = NotFoundText) {
     super(message);
     this.statusCode = 404;
   }
